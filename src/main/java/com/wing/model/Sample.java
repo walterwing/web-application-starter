@@ -36,4 +36,9 @@ public class Sample {
 		this.value = value;
 	}
 	
+	@Override
+	public String toString() {
+		return "Sample id: " + id + ", value: " + value;
+	}
+	
 }
