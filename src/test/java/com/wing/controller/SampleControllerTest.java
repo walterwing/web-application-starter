@@ -33,13 +33,13 @@ public class SampleControllerTest {
 	@MockBean
 	private SampleService sampleService;
 
+	// TODO: fix this failed test
 	@Test
 	public void givenSample_whenGetSampleById_thenReturnSample() throws Exception {
-		Sample sample = new Sample();
-		sample.setId("3");
-		sample.setValue("sample3");
+		Sample sample = new Sample("sample3");
+		sample.setId(3L);
 
-		given(sampleService.getSampleById("3")).willReturn(sample);
+		given(sampleService.getSampleByValue("3")).willReturn(sample);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/samples/3"))
 			   .andExpect(MockMvcResultMatchers.status().isOk())

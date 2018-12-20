@@ -1,10 +1,15 @@
 package com.wing.service;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wing.model.Sample;
+import com.wing.repository.SampleRepository;
 
 /**
  * Sample service implementation.
@@ -13,20 +18,30 @@ import com.wing.model.Sample;
  *
  */
 @Service
+@Transactional
 public class SampleServiceImpl implements SampleService {
 	
 	private Logger logger = LoggerFactory.getLogger(SampleServiceImpl.class);
+	
+	@Autowired
+	SampleRepository sampleRepository;
+	
+	@Autowired
+	EntityManager entityManager;
 
-	public Sample getSampleById(String sampleId) {
-		// For now simply return a new constructed sample
-		// Feel free to change the impl (e.g. fetch sample by running query against some
-		// kind of repository)
-		Sample sample = new Sample();
-		sample.setId(sampleId);
-		sample.setValue("sample" + sampleId);
+	@Override
+	public Sample getSampleByValue(String value) {
+		Sample sample = sampleRepository.findByValue(value);
 		
-		logger.debug("Created Sample: {}", sample);
+		logger.debug("Found Sample: {}", sample);
 
-		return sample;
+		return null;
+	}
+
+	@Override
+	public void createSample(String sampleValue) {
+		Sample sample = new Sample("sample1");
+		entityManager.persist(sample);
+		entityManager.flush();
 	}
 }

@@ -10,10 +10,12 @@ import com.wing.model.Sample;
  */
 public interface SampleService {
 	/**
-	 * Get Sample object by id.
+	 * Get Sample object by value.
 	 * 
-	 * @param sampleId Sample id.
+	 * @param sampleId Sample value.
 	 * @return The Sample object.
 	 */
-	public Sample getSampleById(String sampleId);
+	public Sample getSampleByValue(String sampleValue);
+	
+	public void createSample(String sampleValue);
 }
