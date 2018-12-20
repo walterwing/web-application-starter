@@ -18,7 +18,7 @@ import com.wing.service.SampleService;
  *
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/samples")
 public class SampleController {
 	
 	private Logger logger = LoggerFactory.getLogger(SampleController.class);
@@ -26,7 +26,7 @@ public class SampleController {
 	@Autowired
 	SampleService sampleService;
 	
-	@GetMapping("/samples/{sampleId}")
+	@GetMapping("/{sampleId}")
 	public Sample getSampleById(@PathVariable String sampleId) {
 		final String methodName = "getSampleById";
 		logger.debug("Enter {} with id: {}", methodName, sampleId);
