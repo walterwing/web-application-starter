@@ -24,6 +24,10 @@ public class Sample {
 	@Size(min = 1, max = 100)
 	private String value;
 	
+	protected Sample() {
+		
+	}
+	
 	public Sample(String value) {
 		this.value = value;
 	}
@@ -34,25 +38,14 @@ public class Sample {
 	public Long getId() {
 		return id;
 	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
+
 	/**
 	 * @return the value
 	 */
 	public String getValue() {
 		return value;
 	}
-	/**
-	 * @param value the value to set
-	 */
-	public void setValue(String value) {
-		this.value = value;
-	}
-	
+
 	@Override
 	public String toString() {
 		return "Sample id: " + id + ", value: " + value;

@@ -17,5 +17,10 @@ public interface SampleService {
 	 */
 	public Sample getSampleByValue(String sampleValue);
 	
-	public void createSample(String sampleValue);
+	/**
+	 * Create a new Sample
+	 * @param sampleValue Sample value.
+	 * @return The created Sample object.
+	 */
+	public Sample createSample(String sampleValue);
 }

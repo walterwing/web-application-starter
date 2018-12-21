@@ -8,5 +8,11 @@ import com.wing.model.Sample;
 @Repository
 public interface SampleRepository extends JpaRepository<Sample, Long> {
 	
+	/**
+	 * Find Sample by its value.
+	 * 
+	 * @param value Sample value
+	 * @return Sample object.
+	 */
 	public Sample findByValue(String value);
 }

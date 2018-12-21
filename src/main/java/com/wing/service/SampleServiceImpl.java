@@ -1,6 +1,5 @@
 package com.wing.service;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -26,22 +25,24 @@ public class SampleServiceImpl implements SampleService {
 	@Autowired
 	SampleRepository sampleRepository;
 	
-	@Autowired
-	EntityManager entityManager;
-
 	@Override
 	public Sample getSampleByValue(String value) {
+		for (Sample sample : sampleRepository.findAll()) {
+			logger.debug("-- {}", sample);
+		}
+		
+		logger.debug("findByValue: {}", value);
+		
 		Sample sample = sampleRepository.findByValue(value);
 		
 		logger.debug("Found Sample: {}", sample);
 
-		return null;
+		return sample;
 	}
 
 	@Override
-	public void createSample(String sampleValue) {
-		Sample sample = new Sample("sample1");
-		entityManager.persist(sample);
-		entityManager.flush();
+	public Sample createSample(String sampleValue) {
+		return sampleRepository.save(new Sample(sampleValue));
+		
 	}
 }
