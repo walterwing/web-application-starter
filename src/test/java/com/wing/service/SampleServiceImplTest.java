@@ -36,7 +36,7 @@ public class SampleServiceImplTest {
 	@Test
 	public void whenValidSampleId_thenShouldReturnSample() {
 		String sampleId = "1";
-		Sample sample = sampleService.getSampleByValue(sampleId);
+//		Sample sample = sampleService.getSampleById(sampleId);
 		
 //		assertThat(sample.getId(), is(sampleId));
 //		assertThat(sample.getValue(), is("sample1"));

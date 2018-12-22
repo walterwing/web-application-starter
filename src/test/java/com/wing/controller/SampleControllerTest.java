@@ -39,7 +39,7 @@ public class SampleControllerTest {
 		Sample sample = new Sample("sample3");
 //		sample.setId(3L);
 
-		given(sampleService.getSampleByValue("3")).willReturn(sample);
+//		given(sampleService.getSampleById(1L)).willReturn(sample);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/samples/3"))
 			   .andExpect(MockMvcResultMatchers.status().isOk());

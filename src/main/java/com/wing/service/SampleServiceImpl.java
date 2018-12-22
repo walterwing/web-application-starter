@@ -1,6 +1,7 @@
 package com.wing.service;
 
-import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,28 +14,33 @@ import com.wing.repository.SampleRepository;
 /**
  * Sample service implementation.
  * 
+ * Hint: @Transactional can be used at Service class or methods level if a
+ * service layer method was modified to do multiple calls to repository methods
+ * -- all the code would still execute inside a single transaction as the
+ * repository’s inner transactions would simply join the outer one started at
+ * the service layer.
+ * 
  * @author Wing
  *
  */
 @Service
-@Transactional
 public class SampleServiceImpl implements SampleService {
-	
+
 	private Logger logger = LoggerFactory.getLogger(SampleServiceImpl.class);
-	
+
 	@Autowired
 	SampleRepository sampleRepository;
-	
+
 	@Override
-	public Sample getSampleByValue(String value) {
-		for (Sample sample : sampleRepository.findAll()) {
+	public Optional<Sample> getSampleById(Long id) {
+		/*for (Sample sample : sampleRepository.findAll()) {
 			logger.debug("-- {}", sample);
-		}
-		
-		logger.debug("findByValue: {}", value);
-		
-		Sample sample = sampleRepository.findByValue(value);
-		
+		}*/
+
+		logger.debug("getSampleById: {}", id);
+
+		Optional<Sample> sample = sampleRepository.findById(id);
+
 		logger.debug("Found Sample: {}", sample);
 
 		return sample;
@@ -43,6 +49,11 @@ public class SampleServiceImpl implements SampleService {
 	@Override
 	public Sample createSample(String sampleValue) {
 		return sampleRepository.save(new Sample(sampleValue));
-		
+
+	}
+
+	@Override
+	public List<Sample> findSamplesContainValue(String value) {
+		return sampleRepository.findByValueContains(value);
 	}
 }
