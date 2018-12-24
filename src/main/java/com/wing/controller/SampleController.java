@@ -59,7 +59,7 @@ public class SampleController {
 		logger.debug("Exit {} with created sample: {}", methodName, sample);
 
 		return ResponseEntity
-				.created(UriComponentsBuilder.fromPath("/api/samples/" + sample.getValue()).build().toUri())
+				.created(UriComponentsBuilder.fromPath("/api/samples/" + sample.getId()).build().toUri())
 				.body(sample);
 	}
 
@@ -72,6 +72,11 @@ public class SampleController {
 
 		logger.debug("Exit {} with created sample: {}", methodName, sampleList);
 
-		return ResponseEntity.ok(sampleList);
+		if (!sampleList.isEmpty()) {
+			return ResponseEntity.ok(sampleList);
+		}
+		else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 }
