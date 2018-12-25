@@ -33,10 +33,6 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public Optional<Sample> getSampleById(Long id) {
-		/*for (Sample sample : sampleRepository.findAll()) {
-			logger.debug("-- {}", sample);
-		}*/
-
 		logger.debug("getSampleById: {}", id);
 
 		Optional<Sample> sample = sampleRepository.findById(id);

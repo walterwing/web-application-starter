@@ -17,6 +17,5 @@ public class WebStarterTest {
 
 	@Test
 	public void application_shouldStartWithoutError() {
-		
 	}
 }

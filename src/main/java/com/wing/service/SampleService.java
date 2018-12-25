@@ -27,5 +27,11 @@ public interface SampleService {
 	 */
 	public Sample createSample(String value);
 	
+	/**
+	 * Find all samples whose value contains the specified value.
+	 * 
+	 * @param value Specified value to look for.
+	 * @return Matched samples.
+	 */
 	public List<Sample> findSamplesContainValue(String value);
 }

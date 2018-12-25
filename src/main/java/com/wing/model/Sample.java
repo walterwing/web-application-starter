@@ -1,5 +1,7 @@
 package com.wing.model;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -58,6 +60,30 @@ public class Sample {
 	@Override
 	public String toString() {
 		return "Sample id: " + id + ", value: " + value;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		
+		if (!(o instanceof Sample)) {
+			return false;
+		}
+		
+		Sample that = (Sample) o;
+		
+		return (Objects.equals(id, that.id) && Objects.equals(value, that.value));
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = Objects.hashCode(id);
+		
+		result = 31 * result + Objects.hashCode(value);
+		
+		return result;
 	}
 
 }
