@@ -1,8 +1,13 @@
 package com.wing.controller;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
+import org.mockito.BDDMockito;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.wing.model.Sample;
@@ -34,17 +40,83 @@ public class SampleControllerTest {
 	private SampleService sampleService;
 
 	@Test
-	public void givenSample_whenGetSampleById_thenReturnSample() throws Exception {
-		Sample sample = new Sample();
-		sample.setId("3");
-		sample.setValue("sample3");
+	public void givenExistingId_whenGetSampleById_thenReturnSample() throws Exception {
+		Long id = 1L;
+		
+		Sample sample = new Sample("sample3");
+		
+		BDDMockito.given(sampleService.getSampleById(id)).willReturn(Optional.of(sample));
 
-		given(sampleService.getSampleById("3")).willReturn(sample);
-
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/samples/3"))
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/samples/" + id))
 			   .andExpect(MockMvcResultMatchers.status().isOk())
-			   .andExpect(jsonPath("$.id", is(sample.getId())))
-			   .andExpect(jsonPath("$.value", is(sample.getValue())));
+			   .andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(sample.getValue())));
+		
+		BDDMockito.then(sampleService).should().getSampleById(id);
+	}
+	
+	@Test
+	public void givenMissingId_whenGetSampleById_thenReturn404() throws Exception {
+		Long id = -1L;
+		
+		BDDMockito.given(sampleService.getSampleById(id)).willReturn(Optional.empty());
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/samples/" + id))
+			   .andExpect(MockMvcResultMatchers.status().isNotFound());
+		
+		BDDMockito.then(sampleService).should().getSampleById(id);
+	}
+	
+	@Test
+	public void whenCreateSample_thenReturnSampleAndLocation() throws Exception {
+		String value = "sample3";
+		
+		Sample sample = new Sample(value);
+		
+		BDDMockito.given(sampleService.createSample(value)).willReturn(sample);
+		
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/" + value))
+		   .andExpect(MockMvcResultMatchers.status().isCreated())
+		   .andDo(MockMvcResultHandlers.print())
+		   .andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.is("/api/samples/null")))
+		   .andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(value)));
+		
+		BDDMockito.then(sampleService).should().createSample(value);
+	}
+	
+	@Test
+	public void whenSearchSamplesByValue_thenReturnSamples() throws Exception {
+		String query = "sample";
+		
+		String value1 = "sample1";
+		String value2 = "2sample";
+		
+		Sample sample1 = new Sample(value1);
+		Sample sample2 = new Sample(value2);
+		List<Sample> samples = Arrays.asList(sample1, sample2);
+		
+		BDDMockito.given(sampleService.findSamplesContainValue(query)).willReturn(samples);
+		
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/samples?q=" + query))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+				.andExpect(MockMvcResultMatchers.jsonPath("$..value", Matchers.containsInAnyOrder(value1, value2)));
+		
+		BDDMockito.then(sampleService).should().findSamplesContainValue(query);
+	}
+	
+	@Test
+	public void whenSearchSamplesByValue_thenReturn404() throws Exception {
+		String query = "sample";
+		
+		List<Sample> samples = Collections.emptyList();
+		
+		BDDMockito.given(sampleService.findSamplesContainValue(query)).willReturn(samples);
+		
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/samples?q=" + query))
+				.andExpect(MockMvcResultMatchers.status().isNotFound());
+		
+		BDDMockito.then(sampleService).should().findSamplesContainValue(query);
 	}
 
 }
