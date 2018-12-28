@@ -52,4 +52,9 @@ public class SampleServiceImpl implements SampleService {
 	public List<Sample> findSamplesContainValue(String value) {
 		return sampleRepository.findByValueContains(value);
 	}
+
+	@Override
+	public void deleteSampleById(Long id) {
+		sampleRepository.deleteById(id);
+	}
 }

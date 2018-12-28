@@ -37,7 +37,7 @@ public interface SampleRepository extends JpaRepository<Sample, Long> {
 	 * @param value Sample ID
 	 * @return Sample object.
 	 */
-	public Optional<Sample> findById(Long id);
+//	public Optional<Sample> findById(Long id);
 
 	/**
 	 * Find Samples that contain specified value.

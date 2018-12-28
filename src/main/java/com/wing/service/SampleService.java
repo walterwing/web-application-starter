@@ -34,4 +34,11 @@ public interface SampleService {
 	 * @return Matched samples.
 	 */
 	public List<Sample> findSamplesContainValue(String value);
+	
+	/**
+	 * Delete Sample by ID.
+	 * 
+	 * @param id Sample ID.
+	 */
+	public void deleteSampleById(Long id);
 }
