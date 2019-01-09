@@ -1,17 +1,23 @@
 package com.wing.controller;
 
-import org.junit.Assert;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.persistence.RollbackException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.TransactionSystemException;
 
 import com.wing.model.Sample;
 import com.wing.service.SampleService;
@@ -82,6 +89,32 @@ public class SampleControllerTest {
 				.andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.is("/api/samples/null")))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(value)));
 
+		BDDMockito.then(sampleService).should().createSample(value);
+	}
+	
+	@Test
+	public void givenInvalidValue_whenCreateSample_thenReturn400() throws Exception {
+		final String value = "a_very_long_value_that_exceeds_the_specified_limit";
+
+		ConstraintViolation<?> cv = Mockito.mock(ConstraintViolation.class);
+		ConstraintViolationException ce = new ConstraintViolationException(Stream.of(cv).collect(Collectors.toSet()));
+		RollbackException re = new RollbackException("RollbackException", ce);
+		TransactionSystemException te = new TransactionSystemException("TransactionSystemException", re);
+		
+		final String errorMsg = "bla bla";
+		BDDMockito.given(cv.toString()).willReturn(errorMsg);
+		
+		BDDMockito.given(sampleService.createSample(value)).willThrow(te);
+		
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/" + value))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest())
+				.andExpect(MockMvcResultMatchers.status().reason(CoreMatchers.containsString(errorMsg)))
+				.andDo(MockMvcResultHandlers.print())
+				.andDo(mvcResult -> {
+					Exception exception = mvcResult.getResolvedException();
+					Assert.assertEquals(TransactionSystemException.class, exception.getClass());
+				});
+		
 		BDDMockito.then(sampleService).should().createSample(value);
 	}
 

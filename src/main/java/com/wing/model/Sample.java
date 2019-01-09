@@ -32,7 +32,7 @@ public class Sample {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Size(min = 1, max = 100)
+	@Size(min = 1, max = 10)
 	private String value;
 
 	protected Sample() {
