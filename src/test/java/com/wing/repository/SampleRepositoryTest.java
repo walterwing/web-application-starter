@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.wing.model.Sample;
+import com.wing.entity.Sample;
 
 /**
  * Test {@link SampleRepository}
@@ -38,8 +38,8 @@ public class SampleRepositoryTest {
 
 	@Before
 	public void setUp() {
-		Sample sample1 = new Sample(sampleValue1);
-		Sample sample2 = new Sample("2 sample");
+		Sample sample1 = new Sample(sampleValue1, null);
+		Sample sample2 = new Sample(sampleValue2, null);
 		
 		entityManager.persist(sample1);
 		entityManager.persist(sample2);

@@ -15,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.wing.model.Sample;
+import com.wing.entity.Sample;
 import com.wing.repository.SampleRepository;
 
 /**
@@ -46,7 +46,7 @@ public class SampleServiceImplTest {
 		Long sampleId = 1L;
 		String sampleValue = "sample1";
 
-		BDDMockito.given(sampleRepository.findById(sampleId)).willReturn(Optional.of(new Sample(sampleValue)));
+		BDDMockito.given(sampleRepository.findById(sampleId)).willReturn(Optional.of(new Sample(sampleValue, null)));
 
 		Optional<Sample> sample = sampleService.getSampleById(sampleId);
 
@@ -72,11 +72,11 @@ public class SampleServiceImplTest {
 	@Test
 	public void whencreateSample_thenShouldReturnCreatedSample() {
 		String sampleValue = "sample1";
-		Sample sample = new Sample(sampleValue);
+		Sample sample = new Sample(sampleValue, null);
 
 		BDDMockito.given(sampleRepository.save(sample)).willReturn(sample);
 
-		Sample createdSample = sampleService.createSample(sampleValue);
+		Sample createdSample = sampleService.createSample(sampleValue, null);
 
 		BDDMockito.then(sampleRepository).should().save(sample);
 
@@ -90,8 +90,8 @@ public class SampleServiceImplTest {
 		String value1 = "sample1";
 		String value2 = "2 sample";
 
-		Sample sample1 = new Sample(value1);
-		Sample sample2 = new Sample(value2);
+		Sample sample1 = new Sample(value1, null);
+		Sample sample2 = new Sample(value2, null);
 
 		BDDMockito.given(sampleRepository.findByValueContains(sampleValue)).willReturn(Arrays.asList(sample1, sample2));
 

@@ -1,7 +1,9 @@
-package com.wing.model;
+package com.wing.entity;
 
 import java.util.Objects;
+import java.util.Optional;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,13 +36,18 @@ public class Sample {
 
 	@Size(min = 1, max = 10)
 	private String value;
+	
+	@Size(max = 100)
+	@Column(nullable = true)
+	private String description;
 
 	protected Sample() {
 
 	}
 
-	public Sample(String value) {
+	public Sample(String value, String description) {
 		this.value = value;
+		this.description = description;
 	}
 
 	/**
@@ -57,9 +64,16 @@ public class Sample {
 		return value;
 	}
 
+	/**
+	 * @return the description
+	 */
+	public Optional<String> getDescription() {
+		return Optional.ofNullable(description);
+	}
+
 	@Override
 	public String toString() {
-		return "Sample id: " + id + ", value: " + value;
+		return "Sample id: " + id + ", value: " + value + ", description: " + description;
 	}
 	
 	@Override
@@ -74,7 +88,7 @@ public class Sample {
 		
 		Sample that = (Sample) o;
 		
-		return (Objects.equals(id, that.id) && Objects.equals(value, that.value));
+		return (Objects.equals(id, that.id) && Objects.equals(value, that.value) && Objects.equals(description, that.description));
 	}
 	
 	@Override
@@ -82,6 +96,8 @@ public class Sample {
 		int result = Objects.hashCode(id);
 		
 		result = 31 * result + Objects.hashCode(value);
+		
+		result = 31 * result + Objects.hashCode(description);
 		
 		return result;
 	}

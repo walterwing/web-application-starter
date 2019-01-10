@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,7 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.TransactionSystemException;
 
-import com.wing.model.Sample;
+import com.wing.entity.Sample;
 import com.wing.service.SampleService;
 
 /**
@@ -52,7 +53,7 @@ public class SampleControllerTest {
 	public void givenExistingId_whenGetSampleById_thenReturnSample() throws Exception {
 		Long id = 1L;
 
-		Sample sample = new Sample("sample3");
+		Sample sample = new Sample("sample3", null);
 
 		BDDMockito.given(sampleService.getSampleById(id)).willReturn(Optional.of(sample));
 
@@ -79,17 +80,41 @@ public class SampleControllerTest {
 	public void whenCreateSample_thenReturnSampleAndLocation() throws Exception {
 		String value = "sample3";
 
-		Sample sample = new Sample(value);
+		Sample sample = new Sample(value, null);
 
-		BDDMockito.given(sampleService.createSample(value)).willReturn(sample);
+		BDDMockito.given(sampleService.createSample(value, null)).willReturn(sample);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/" + value))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/")
+												.contentType(MediaType.APPLICATION_JSON)
+												.content("{\"value\":\"" + value + "\"}"))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.is("/api/samples/null")))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(value)));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(value)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description", CoreMatchers.nullValue()));
 
-		BDDMockito.then(sampleService).should().createSample(value);
+		BDDMockito.then(sampleService).should().createSample(value, null);
+	}
+	
+	@Test
+	public void givenDescription_whenCreateSample_thenReturnSampleAndLocation() throws Exception {
+		String value = "sample3";
+		String description = "description 1";
+
+		Sample sample = new Sample(value, description);
+
+		BDDMockito.given(sampleService.createSample(value, description)).willReturn(sample);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/")
+											  .contentType(MediaType.APPLICATION_JSON_UTF8)
+											  .content("{\"value\":\"" + value + "\",\"description\":\"" + description + "\"}"))
+				.andExpect(MockMvcResultMatchers.status().isCreated())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.is("/api/samples/null")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(value)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description", CoreMatchers.is(description)));
+
+		BDDMockito.then(sampleService).should().createSample(value, description);
 	}
 	
 	@Test
@@ -104,9 +129,11 @@ public class SampleControllerTest {
 		final String errorMsg = "bla bla";
 		BDDMockito.given(cv.toString()).willReturn(errorMsg);
 		
-		BDDMockito.given(sampleService.createSample(value)).willThrow(te);
+		BDDMockito.given(sampleService.createSample(value, null)).willThrow(te);
 		
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/" + value))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/")
+											  .contentType(MediaType.APPLICATION_JSON)
+											  .content("{\"value\":\"" + value + "\"}"))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest())
 				.andExpect(MockMvcResultMatchers.status().reason(CoreMatchers.containsString(errorMsg)))
 				.andDo(MockMvcResultHandlers.print())
@@ -115,7 +142,7 @@ public class SampleControllerTest {
 					Assert.assertEquals(TransactionSystemException.class, exception.getClass());
 				});
 		
-		BDDMockito.then(sampleService).should().createSample(value);
+		BDDMockito.then(sampleService).should().createSample(value, null);
 	}
 
 	@Test
@@ -125,8 +152,8 @@ public class SampleControllerTest {
 		String value1 = "sample1";
 		String value2 = "2sample";
 
-		Sample sample1 = new Sample(value1);
-		Sample sample2 = new Sample(value2);
+		Sample sample1 = new Sample(value1, null);
+		Sample sample2 = new Sample(value2, null);
 		List<Sample> samples = Arrays.asList(sample1, sample2);
 
 		BDDMockito.given(sampleService.findSamplesContainValue(query)).willReturn(samples);

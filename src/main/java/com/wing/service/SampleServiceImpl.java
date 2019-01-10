@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.wing.model.Sample;
+import com.wing.entity.Sample;
 import com.wing.repository.SampleRepository;
 
 /**
@@ -43,8 +43,8 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Sample createSample(String sampleValue) {
-		return sampleRepository.save(new Sample(sampleValue));
+	public Sample createSample(String sampleValue, String description) {
+		return sampleRepository.save(new Sample(sampleValue, description));
 
 	}
 

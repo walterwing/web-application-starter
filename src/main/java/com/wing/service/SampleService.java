@@ -3,7 +3,7 @@ package com.wing.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.wing.model.Sample;
+import com.wing.entity.Sample;
 
 /**
  * Interface of Sample Service.
@@ -25,7 +25,7 @@ public interface SampleService {
 	 * @param value Sample value.
 	 * @return The created Sample object.
 	 */
-	public Sample createSample(String value);
+	public Sample createSample(String value, String description);
 	
 	/**
 	 * Find all samples whose value contains the specified value.
