@@ -2,9 +2,13 @@ package com.wing.model;
 
 import java.util.Objects;
 
+import javax.validation.constraints.Size;
+
 public class SampleParameter {
+	@Size(min = 1, max = 10)
 	private final String value;
 	
+	@Size(max = 100)
 	private final String description;
 	
 	public SampleParameter(String value, String description) {

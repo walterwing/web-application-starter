@@ -3,6 +3,8 @@ package com.wing.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,7 @@ public class SampleController {
 	}
 
 	@PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Sample> createNewSample(@RequestBody SampleParameter sampleParameter) {
+	public ResponseEntity<Sample> createNewSample(@RequestBody @Valid SampleParameter sampleParameter) {
 		final String methodName = "createNewSample";
 		logger.debug("Enter {} with value: {}", methodName, sampleParameter);
 
