@@ -43,9 +43,24 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
+	public Sample getSampleForUpdateById(Long id) {
+		logger.debug("getSampleForUpdateById: {}", id);
+		
+		Sample sample = sampleRepository.getOne(id);
+		
+		logger.debug("Found Sample: {}", sample);
+		
+		return sample;
+	}
+
+	@Override
 	public Sample createSample(String sampleValue, String description) {
 		return sampleRepository.save(new Sample(sampleValue, description));
+	}
 
+	@Override
+	public Sample updateSample(Sample sample) {
+		return sampleRepository.save(sample);
 	}
 
 	@Override

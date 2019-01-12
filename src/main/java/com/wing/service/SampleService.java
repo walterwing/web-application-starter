@@ -16,9 +16,19 @@ public interface SampleService {
 	 * Get Sample object by ID.
 	 * 
 	 * @param id Sample ID.
-	 * @return The Sample object.
+	 * @return The Optional Sample object.
 	 */
 	public Optional<Sample> getSampleById(Long id);
+	
+	/**
+	 * Get Sample object by ID. The difference with {@link #getSampleById(Long id)}
+	 * is that this implementation should return the reference rather than the
+	 * entity itself.
+	 * 
+	 * @param id Sample ID.
+	 * @return The Sample object.
+	 */
+	public Sample getSampleForUpdateById(Long id);
 	
 	/**
 	 * Create a new Sample
@@ -26,6 +36,14 @@ public interface SampleService {
 	 * @return The created Sample object.
 	 */
 	public Sample createSample(String value, String description);
+	
+	/**
+	 * Update Sample.
+	 * 
+	 * @param sample Sample object.
+	 * @return Updated Sample.
+	 */
+	public Sample updateSample(Sample sample);
 	
 	/**
 	 * Find all samples whose value contains the specified value.

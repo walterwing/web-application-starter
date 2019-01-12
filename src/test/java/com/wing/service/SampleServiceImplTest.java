@@ -70,7 +70,7 @@ public class SampleServiceImplTest {
 	}
 
 	@Test
-	public void whencreateSample_thenShouldReturnCreatedSample() {
+	public void whenCreateSample_thenShouldReturnCreatedSample() {
 		String sampleValue = "sample1";
 		Sample sample = new Sample(sampleValue, null);
 
@@ -81,6 +81,22 @@ public class SampleServiceImplTest {
 		BDDMockito.then(sampleRepository).should().save(sample);
 
 		Assertions.assertThat(createdSample.getValue()).isEqualTo(sampleValue);
+	}
+	
+	@Test
+	public void whenUpdate_thenShouldReturnUpdatedSample() {
+		String sampleValue = "sample1";
+		String description = "description1";
+		Sample sample = new Sample(sampleValue, description);
+
+		BDDMockito.given(sampleRepository.save(sample)).willReturn(sample);
+
+		Sample updatedSample = sampleService.updateSample(sample);
+
+		BDDMockito.then(sampleRepository).should().save(sample);
+		
+		Assertions.assertThat(updatedSample.getValue()).isEqualTo(sampleValue);
+		Assertions.assertThat(updatedSample.getDescription()).isEqualTo(Optional.of(description));
 	}
 
 	@Test

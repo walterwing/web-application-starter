@@ -36,7 +36,7 @@ public class Sample {
 
 	@Size(min = 1, max = 10)
 	private String value;
-	
+
 	@Size(max = 100)
 	@Column(nullable = true)
 	private String description;
@@ -65,10 +65,24 @@ public class Sample {
 	}
 
 	/**
+	 * @param value the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	/**
 	 * @return the description
 	 */
 	public Optional<String> getDescription() {
 		return Optional.ofNullable(description);
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override

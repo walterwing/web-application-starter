@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,6 +68,23 @@ public class SampleController {
 		return ResponseEntity
 				.created(UriComponentsBuilder.fromPath("/api/samples/" + sample.getId()).build().toUri())
 				.body(sample);
+	}
+	
+	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Sample> updateSample(@PathVariable Long id, @RequestBody @Valid SampleParameter sampleParameter) {
+		final String methodName = "updateSample";
+		
+		logger.debug("Enter {} with id: {} and sample parameter: {}", methodName, id, sampleParameter);
+		
+		Sample sample = sampleService.getSampleForUpdateById(id);
+		sample.setValue(sampleParameter.getValue());
+		sample.setDescription(sampleParameter.getDescription());
+		
+		sample = sampleService.updateSample(sample);
+		
+		logger.debug("Exit {} with updated sample: {}", methodName, sample);
+		
+		return ResponseEntity.ok(sample);
 	}
 
 	@GetMapping

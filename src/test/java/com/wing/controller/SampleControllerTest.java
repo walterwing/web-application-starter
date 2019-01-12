@@ -78,7 +78,7 @@ public class SampleControllerTest {
 		BDDMockito.given(sampleService.createSample(value, null)).willReturn(sample);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/")
-												.contentType(MediaType.APPLICATION_JSON)
+												.contentType(MediaType.APPLICATION_JSON_UTF8)
 												.content("{\"value\":\"" + value + "\"}"))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andDo(MockMvcResultHandlers.print())
@@ -125,6 +125,57 @@ public class SampleControllerTest {
 					Assert.assertThat(exception.getMessage(), Matchers.containsString("size must be between 1 and 10"));
 				});
 		
+		BDDMockito.then(sampleService).shouldHaveZeroInteractions();
+	}
+	
+	@Test
+	public void whenUpdateSample_thenShouldReturnUpdatedSample() throws Exception {
+		String value = "sample value1";
+		String description = "description 1";
+
+		Sample sample = new Sample(value, description);
+		
+		final Long sampleId = 1L;
+		
+		BDDMockito.given(sampleService.getSampleForUpdateById(sampleId)).willReturn(sample);
+		
+		String updatedValue = "new value1";
+		String updatedDescription = "new description 1";
+		Sample updatedSample = new Sample(updatedValue, updatedDescription);
+		
+		BDDMockito.given(sampleService.updateSample(sample)).willReturn(updatedSample);
+		
+		mockMvc.perform(MockMvcRequestBuilders.put("/api/samples/" + sampleId)
+											  .contentType(MediaType.APPLICATION_JSON_UTF8)
+											  .content("{\"value\":\"" + updatedValue + "\",\"description\":\"" + updatedDescription + "\"}"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(updatedValue)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description", CoreMatchers.is(updatedDescription)));
+		
+		BDDMockito.then(sampleService).should().getSampleForUpdateById(sampleId);
+		BDDMockito.then(sampleService).should().updateSample(sample);
+		
+	}
+	
+	@Test
+	public void givenInvalidValue_whenUpdateSample_thenShouldReturnUpdatedSample() throws Exception {
+		String updatedValue = "a_very_long_value_that_exceeds_the_specified_limit";
+		String updatedDescription = "new description 1";
+		
+		final Long sampleId = 1L;
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/api/samples/" + sampleId)
+				  							  .contentType(MediaType.APPLICATION_JSON_UTF8)
+				  							  .content("{\"value\":\"" + updatedValue + "\",\"description\":\"" + updatedDescription + "\"}"))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest())
+				.andDo(MockMvcResultHandlers.print())
+				.andDo(mvcResult -> {
+					Exception exception = mvcResult.getResolvedException();
+					Assert.assertEquals(MethodArgumentNotValidException.class, exception.getClass());
+					Assert.assertThat(exception.getMessage(), Matchers.containsString("size must be between 1 and 10"));
+				});
+				
 		BDDMockito.then(sampleService).shouldHaveZeroInteractions();
 	}
 
