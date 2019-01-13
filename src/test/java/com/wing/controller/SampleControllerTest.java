@@ -23,7 +23,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wing.entity.Sample;
+import com.wing.model.SampleDescriptionParameter;
+import com.wing.model.SampleParameter;
 import com.wing.service.SampleService;
 
 /**
@@ -41,6 +44,9 @@ public class SampleControllerTest {
 
 	@MockBean
 	private SampleService sampleService;
+	
+	@Autowired
+	ObjectMapper objectMapper;
 
 	@Test
 	public void givenExistingId_whenGetSampleById_thenReturnSample() throws Exception {
@@ -79,7 +85,7 @@ public class SampleControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/")
 												.contentType(MediaType.APPLICATION_JSON_UTF8)
-												.content("{\"value\":\"" + value + "\"}"))
+												.content(objectMapper.writeValueAsString(new SampleParameter(value, null))))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.is("/api/samples/null")))
@@ -100,7 +106,7 @@ public class SampleControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/")
 											  .contentType(MediaType.APPLICATION_JSON_UTF8)
-											  .content("{\"value\":\"" + value + "\",\"description\":\"" + description + "\"}"))
+											  .content(objectMapper.writeValueAsString(new SampleParameter(value, description))))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.is("/api/samples/null")))
@@ -116,7 +122,7 @@ public class SampleControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/samples/")
 											  .contentType(MediaType.APPLICATION_JSON_UTF8)
-											  .content("{\"value\":\"" + value + "\"}"))
+											  .content(objectMapper.writeValueAsString(new SampleParameter(value, null))))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest())
 				.andDo(MockMvcResultHandlers.print())
 				.andDo(mvcResult -> {
@@ -147,7 +153,7 @@ public class SampleControllerTest {
 		
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/samples/" + sampleId)
 											  .contentType(MediaType.APPLICATION_JSON_UTF8)
-											  .content("{\"value\":\"" + updatedValue + "\",\"description\":\"" + updatedDescription + "\"}"))
+											  .content(objectMapper.writeValueAsString(new SampleParameter(updatedValue, updatedDescription))))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(updatedValue)))
@@ -167,7 +173,7 @@ public class SampleControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/api/samples/" + sampleId)
 				  							  .contentType(MediaType.APPLICATION_JSON_UTF8)
-				  							  .content("{\"value\":\"" + updatedValue + "\",\"description\":\"" + updatedDescription + "\"}"))
+				  							  .content(objectMapper.writeValueAsString(new SampleParameter(updatedValue, updatedDescription))))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest())
 				.andDo(MockMvcResultHandlers.print())
 				.andDo(mvcResult -> {
@@ -177,6 +183,35 @@ public class SampleControllerTest {
 				});
 				
 		BDDMockito.then(sampleService).shouldHaveZeroInteractions();
+	}
+	
+	@Test
+	public void whenUpdateDescription_thenShouldReturnUpdatedSample() throws Exception {
+		String value = "sample value1";
+		String description = "description 1";
+
+		Sample sample = new Sample(value, description);
+		
+		final Long sampleId = 1L;
+		
+		BDDMockito.given(sampleService.getSampleForUpdateById(sampleId)).willReturn(sample);
+		
+		String updatedDescription = "new description 1";
+		Sample updatedSample = new Sample(value, updatedDescription);
+		
+		BDDMockito.given(sampleService.updateSample(sample)).willReturn(updatedSample);
+		
+		mockMvc.perform(MockMvcRequestBuilders.patch("/api/samples/" + sampleId)
+											  .contentType(MediaType.APPLICATION_JSON_UTF8)
+											  .content(objectMapper.writeValueAsString(new SampleDescriptionParameter(updatedDescription))))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.value", CoreMatchers.is(value)))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description", CoreMatchers.is(updatedDescription)));
+		
+		BDDMockito.then(sampleService).should().getSampleForUpdateById(sampleId);
+		BDDMockito.then(sampleService).should().updateSample(sample);
+		
 	}
 
 	@Test

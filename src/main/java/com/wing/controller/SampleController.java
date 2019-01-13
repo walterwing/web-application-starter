@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.wing.entity.Sample;
+import com.wing.model.SampleDescriptionParameter;
 import com.wing.model.SampleParameter;
 import com.wing.service.SampleService;
 
@@ -79,6 +81,22 @@ public class SampleController {
 		Sample sample = sampleService.getSampleForUpdateById(id);
 		sample.setValue(sampleParameter.getValue());
 		sample.setDescription(sampleParameter.getDescription());
+		
+		sample = sampleService.updateSample(sample);
+		
+		logger.debug("Exit {} with updated sample: {}", methodName, sample);
+		
+		return ResponseEntity.ok(sample);
+	}
+	
+	@PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Sample> updateDescription(@PathVariable Long id, @RequestBody @Valid SampleDescriptionParameter sampleDescriptionParameter) {
+		final String methodName = "updateDescription";
+		
+		logger.debug("Enter {} with id: {} and sample parameter: {}", methodName, id, sampleDescriptionParameter);
+		
+		Sample sample = sampleService.getSampleForUpdateById(id);
+		sample.setDescription(sampleDescriptionParameter.getDescription());
 		
 		sample = sampleService.updateSample(sample);
 		
