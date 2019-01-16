@@ -1,0 +1,274 @@
+openapi: 3.0.0
+info:
+  title: Sample API
+  description: API specifications for the [web-application-starter](https://github.com/walterwing/web-application-starter) project.
+  version: 0.0.1
+
+servers:
+  - url: 'http://localhost:8080'
+    description: Local development server.
+
+paths:
+  /api/samples/{id}:
+    get:
+      summary: Get a sample by id.
+      description: Get a sample by id.
+      operationId: getSample
+      tags: 
+        - Sample
+      parameters: 
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Sample id.
+      responses:
+        '200':
+          description: Sample found by id.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Sample'
+        '404':
+          description: Not found.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+    put:
+      summary: Update an existing Sample.
+      description: Update an existing Sample specified by id.
+      tags: 
+        - Sample
+      parameters: 
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Sample id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleParameter'
+            example:
+              value: new value
+              description: new description
+      responses:
+        '200':
+          description: Updated the specified Sample successfully.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Sample'
+              example:
+                id: 1
+                value: new value
+                description: new description
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+    patch:
+      summary: Update the description of an existing Sample.
+      description: Update the description of an existing Sample specified by id.
+      tags: 
+        - Sample
+      parameters: 
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Sample id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleParameter'
+            example:
+              description: new description
+      responses:
+        '200':
+          description: Updated the description of specified Sample successfully.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Sample'
+              example:
+                id: 1
+                value: sample value
+                description: new description
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+    delete:
+      summary: Delete specified Sample by id.
+      description: Delete specified Sample by id.
+      tags: 
+        - Sample
+      parameters: 
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Sample id.
+      responses:
+        '204':
+          description: Deleted specified Sample successfully.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/samples/:
+    post:
+      summary: Create a new Sample.
+      description: Create a new Sample with given input.
+      operationId: createSample
+      tags: 
+        - Sample
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SampleParameter'
+      responses:
+        '201':
+          description: Created a new Sample successfully.
+          headers:
+            Location:
+              schema: 
+                type: string
+              description: URI pointing to the newly created Sample.
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Sample'
+          links:
+            GetSampleById:
+              $ref: '#/components/links/GetSampleById'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    get:
+      summary: Search for Samples by specified value.
+      description: Search for Samples whose value contain the specified value.
+      tags: 
+        - Sample
+      parameters: 
+        - in: query
+          name: q
+          schema:
+            type: string
+          required: true
+          description: Sample value.
+      responses:
+        '200':
+          description: Found matched Samples.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sample'
+              example:
+                - id: 1
+                  value: sample value 1
+                  description: sample description 1
+                - id: 3
+                  value: sample value 3
+        '404':
+          description: Not found.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+components:
+  schemas:
+    SampleParameter:
+      type: object
+      properties:
+        value:
+          type: string
+          minLength: 1
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 100
+      example:
+        value: sample value
+        description: sample description
+    
+    Sample:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          type: string
+          minLength: 1
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 100
+      required:
+        - id
+        - value
+      example:
+        id: 1
+        value: sample value
+        description: sample description
+    
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+      example:
+        code: 500
+        message: Internal Server Error
+  
+  links:
+    GetSampleById:
+      description: >
+        The `id` value returned in the response can be used as the `id` parameter in `GET /api/samples/{id}`.
+      operationId: getSample
+      parameters:
+        id: '$response.body#/id'
+    
